@@ -9,6 +9,7 @@ class BulkUpdateOrCreateMixin:
         batch_size=100,
         case_insensitive_match=False,
         status_cb=None,
+        db_to_use = 'default'
     ):
         """
         Helper method that returns a context manager (_BulkUpdateOrCreateContextManager) that makes it easier to handle
@@ -30,6 +31,7 @@ class BulkUpdateOrCreateMixin:
             status_cb=status_cb,
             match_field=match_field,
             case_insensitive_match=case_insensitive_match,
+            db_to_use = db_to_use
         )
 
     def bulk_update_or_create(
@@ -171,7 +173,7 @@ class BulkUpdateOrCreateQuerySet(BulkUpdateOrCreateMixin, models.QuerySet):
 
 
 class _BulkUpdateOrCreateContextManager:
-    def __init__(self, queryset, update_fields, batch_size=500, status_cb=None, **kwargs):
+    def __init__(self, queryset, update_fields, batch_size=500, status_cb=None, db_to_use = 'default', **kwargs):
         self._queue = []
         self._queryset = queryset
         self._batch_size = batch_size
@@ -179,6 +181,7 @@ class _BulkUpdateOrCreateContextManager:
         self._cb = status_cb
         self._fields = update_fields
         self._kwargs = kwargs
+        self.db_to_use = db_to_use
 
     def queue(self, obj):
         self._queue.append(obj)
@@ -199,6 +202,7 @@ class _BulkUpdateOrCreateContextManager:
             self._queue,
             self._fields,
             yield_objects=self._cb is not None,
+            db_to_use = self.db_to_use,
             **self._kwargs,
         )
         if self._cb is not None:
@@ -212,3 +216,5 @@ class _BulkUpdateOrCreateContextManager:
 
     def __exit__(self, type, value, traceback):
         self.dump_queue()
+
+
