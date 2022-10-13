@@ -40,6 +40,7 @@ class BulkUpdateOrCreateMixin:
         batch_size=None,
         case_insensitive_match=False,
         yield_objects=False,
+        db_to_use = 'default'
     ):
         """
 
@@ -59,6 +60,7 @@ class BulkUpdateOrCreateMixin:
             batch_size,
             case_insensitive_match,
             yield_objects,
+            db_to_use = db_to_use
         )
         if yield_objects:
             return r
@@ -115,6 +117,7 @@ class BulkUpdateOrCreateMixin:
         batch_size=None,
         case_insensitive_match=False,
         yield_objects=False,
+        db_to_use = 'default',
     ):
         # validations like bulk_update
         if batch_size is not None and batch_size < 0:
@@ -153,11 +156,11 @@ class BulkUpdateOrCreateMixin:
                     setattr(to_u, _f, getattr(obj, _f))
                 del obj_map[_obj_key_getter(to_u)]
             self.bulk_update(to_update, update_fields)
-
+            
             # .create on the remaining (bulk_create won't work on multi-table inheritance models...)
             created_objs = []
             for obj in obj_map.values():
-                obj.save()
+                obj.save(using = db_to_use)
                 created_objs.append(obj)
             if yield_objects:
                 yield created_objs, to_update
