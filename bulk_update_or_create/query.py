@@ -163,12 +163,12 @@ class BulkUpdateOrCreateMixin:
             
             if obj_map:
                 self.bulk_create(obj_map.values())
-            # created_objs = []
-            # for obj in obj_map.values():
-            #     obj.save(using = db_to_use)
-            #     created_objs.append(obj)
-            # if yield_objects:
-            #     yield created_objs, to_update
+            created_objs = []
+            for obj in obj_map.values():
+                # obj.save(using = db_to_use)
+                created_objs.append(obj)
+            if yield_objects:
+                yield created_objs, to_update
 
 
 class BulkUpdateOrCreateQuerySet(BulkUpdateOrCreateMixin, models.QuerySet):
