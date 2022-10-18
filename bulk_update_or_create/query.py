@@ -160,9 +160,9 @@ class BulkUpdateOrCreateMixin:
             self.bulk_update(to_update, update_fields)
             
             # .create on the remaining (bulk_create won't work on multi-table inheritance models...)
-            to_create = obj_map.values()
-            if to_create:
-                self.bulk_create(to_create)
+            
+            if obj_map:
+                self.bulk_create(obj_map.values())
             # created_objs = []
             # for obj in obj_map.values():
             #     obj.save(using = db_to_use)
