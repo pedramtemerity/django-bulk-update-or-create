@@ -160,12 +160,14 @@ class BulkUpdateOrCreateMixin:
             self.bulk_update(to_update, update_fields)
             
             # .create on the remaining (bulk_create won't work on multi-table inheritance models...)
-            created_objs = []
-            for obj in obj_map.values():
-                obj.save(using = db_to_use)
-                created_objs.append(obj)
-            if yield_objects:
-                yield created_objs, to_update
+            to_create = obj_map.values()
+            self.bulk_create(to_create)
+            # created_objs = []
+            # for obj in obj_map.values():
+            #     obj.save(using = db_to_use)
+            #     created_objs.append(obj)
+            # if yield_objects:
+            #     yield created_objs, to_update
 
 
 class BulkUpdateOrCreateQuerySet(BulkUpdateOrCreateMixin, models.QuerySet):
@@ -185,7 +187,7 @@ class _BulkUpdateOrCreateContextManager:
 
     def queue(self, obj):
         self._queue.append(obj)
-        if len(self._queue) >= self._batch_size:
+        if len(self._queue) >= self._batch_size:  
             self.dump_queue()
 
     def queue_obj(self, **kwargs):
