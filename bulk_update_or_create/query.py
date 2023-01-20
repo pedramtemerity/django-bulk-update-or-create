@@ -169,6 +169,7 @@ class BulkUpdateOrCreateMixin:
                 created_objs.append(obj)
             if yield_objects:
                 yield created_objs, to_update
+        return created_objs, to_update
 
 
 class BulkUpdateOrCreateQuerySet(BulkUpdateOrCreateMixin, models.QuerySet):
