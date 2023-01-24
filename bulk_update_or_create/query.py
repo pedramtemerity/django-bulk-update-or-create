@@ -122,13 +122,16 @@ class BulkUpdateOrCreateMixin:
         db_to_use = 'default',
     ):
         # validations like bulk_update
+        print("hi1")
         if batch_size is not None and batch_size < 0:
             raise ValueError('Batch size must be a positive integer.')
         if not update_fields:
             raise ValueError('update_fields cannot be empty')
         match_field = (match_field,) if isinstance(match_field, str) else match_field
         _match_fields = [self.model._meta.get_field(name) for name in match_field]
+        print('mathc_fields:',_match_fields)
         _update_fields = [self.model._meta.get_field(name) for name in update_fields]
+        print('update_fields:',_update_fields)
         if any(not f.concrete or f.many_to_many for f in _update_fields):
             raise ValueError('bulk_update_or_create() can only be used with concrete fields.')
         if any(f.primary_key for f in _update_fields):
@@ -148,13 +151,14 @@ class BulkUpdateOrCreateMixin:
 
         for batch in batches:
             obj_map = {_obj_key_getter(obj): obj for obj in batch}
-
+            print('obj_map:',obj_map)
             # mass select for bulk_update on existing ones
             to_update = self.filter(_obj_filter(obj_map))
-
+            print('to_update:',to_update)
             for to_u in to_update:
                 obj = obj_map[_obj_key_getter(to_u)]
                 for _f in update_fields:
+                    print('_f:',_f)
                     setattr(to_u, _f, getattr(obj, _f))
                 del obj_map[_obj_key_getter(to_u)]
             self.bulk_update(to_update, update_fields)
