@@ -159,6 +159,7 @@ class BulkUpdateOrCreateMixin:
                 obj = obj_map[_obj_key_getter(to_u)]
                 for _f in update_fields:
                     print('_f:',_f)
+                    print(obj)
                     setattr(to_u, _f, getattr(obj, _f))
                 del obj_map[_obj_key_getter(to_u)]
             self.bulk_update(to_update, update_fields)
